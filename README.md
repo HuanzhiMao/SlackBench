@@ -16,22 +16,13 @@ Opening `index.html` straight from disk also works.
 
 ## Deploy to GitHub Pages
 
-1. Create a GitHub repository (for example `slackbench`) and push this folder's contents to `main`.
-2. In the repository, open **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, then `main` and `/ (root)`.
-3. Within a minute or two the site is live at `https://<user-or-org>.github.io/<repo>/`.
+The site is hosted from [HuanzhiMao/SlackBench](https://github.com/HuanzhiMao/SlackBench) at **[https://huanzhimao.com/SlackBench/](https://huanzhimao.com/SlackBench/)**. Push updates to `main` to publish them through GitHub Pages.
 
-`.nojekyll` makes GitHub serve the files as they are, without running Jekyll. `404.html` is a self-contained not-found page whose "Back" link works on project sites, `<name>.github.io` sites and custom domains.
+In **Settings → Pages**, the source is **Deploy from a branch**, with `main` and `/ (root)` selected, and **Enforce HTTPS** enabled. `.nojekyll` makes GitHub serve the files as they are, without running Jekyll. `404.html` is a self-contained not-found page whose "Back" link works on project sites, `<name>.github.io` sites and custom domains.
 
-**Before sharing the link**, make the social-card tags in `index.html` absolute. Link-preview crawlers (X, LinkedIn, Slack, …) ignore relative image URLs:
+The project inherits the user site's custom domain: [https://huanzhimao.github.io/SlackBench/](https://huanzhimao.github.io/SlackBench/) redirects to `https://huanzhimao.com/SlackBench/`. No project-level `CNAME` file is needed for this setup.
 
-```html
-<meta property="og:image" content="https://<user>.github.io/<repo>/assets/img/og.png">
-<meta property="og:url" content="https://<user>.github.io/<repo>/">
-<meta name="twitter:image" content="https://<user>.github.io/<repo>/assets/img/og.png">
-<link rel="canonical" href="https://<user>.github.io/<repo>/">
-```
-
-For a custom domain, add a `CNAME` file containing the domain and configure DNS as described in GitHub's Pages docs.
+Keep the canonical URL, `og:url`, `og:image`, and `twitter:image` in `index.html` aligned with the production domain and `/SlackBench/` path. Social-card image URLs must remain absolute. After changing the domain or deployment path, update those tags and verify the published page and assets.
 
 ## Edit links (arXiv, code, dataset)
 
