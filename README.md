@@ -41,13 +41,13 @@ Every external link is set in **`assets/js/config.js`**:
 links: {
   paper: "https://openreview.net/forum?id=Nc9EWtWWx4",
   neurips: "https://neurips.cc/virtual/2026/poster/139475",
-  arxiv: null,    // set to the arXiv URL when available
+  arxiv: "https://arxiv.org/abs/2611.05512",
   code: null,     // set to the GitHub repo URL
-  dataset: null,  // set to the dataset URL
+  dataset: "https://huggingface.co/datasets/HuanzhiMao/SlackBench",
   harbor: "https://github.com/harbor-framework/harbor"
 },
 contact: "huanzhimao@berkeley.edu",
-updated: "2026-11-06"
+updated: "2026-11-11"
 ```
 
 A link left as `null` shows as a disabled **Soon** button. Setting it turns on every button, nav icon and footer link that points there.

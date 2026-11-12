@@ -7,11 +7,11 @@ window.SLACKBENCH_CONFIG = {
   links: {
     paper: "https://openreview.net/forum?id=Nc9EWtWWx4",
     neurips: "https://neurips.cc/virtual/2026/poster/139475",
-    arxiv: null,    // e.g. "https://arxiv.org/abs/XXXX.XXXXX"
+    arxiv: "https://arxiv.org/abs/2611.05512",
     code: null,     // e.g. "https://github.com/<org>/slackbench"
-    dataset: null,  // e.g. "https://huggingface.co/datasets/<org>/slackbench"
+    dataset: "https://huggingface.co/datasets/HuanzhiMao/SlackBench",
     harbor: "https://github.com/harbor-framework/harbor"
   },
   contact: "huanzhimao@berkeley.edu",
-  updated: "2026-11-06"
+  updated: "2026-11-11"
 };
