@@ -1,0 +1,93 @@
+/* cost.css: Finding 03 scatter, accuracy vs. cost / steps (#viz-cost, prefix "cost-").
+   Colors come only from site.css tokens. Neutral marks are --c-overall mixed halfway
+   toward the surface, so they stay quiet next to --c-highlight in both themes. */
+
+#viz-cost,
+.cost-tip { --cost-dot: var(--ink-3); }
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  #viz-cost,
+  .cost-tip { --cost-dot: color-mix(in srgb, var(--c-overall) 50%, var(--surface)); }
+}
+
+/* ---------- chrome ---------- */
+#viz-cost .cost-headtext { min-width: 0; }
+#viz-cost .viz-sub { max-width: 46em; text-wrap: pretty; }
+#viz-cost .cost-controls { margin-bottom: 12px; }
+#viz-cost .cost-seg .cost-s { display: none; }
+#viz-cost.cost-compact .cost-seg .cost-l { display: none; }
+#viz-cost.cost-compact .cost-seg .cost-s { display: inline; }
+
+#viz-cost .cost-legend { gap: 6px 16px; margin-bottom: 8px; font-size: 12.5px; line-height: 1.35; }
+#viz-cost .cost-key { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+#viz-cost .cost-key svg { display: block; flex: none; overflow: visible; }
+#viz-cost .cost-key-front { display: inline-flex; flex: none; }
+
+/* ---------- plot ---------- */
+#viz-cost .cost-body { position: relative; }
+#viz-cost .cost-svg { display: block; }
+#viz-cost .cost-hit { position: absolute; left: 0; top: 0; overflow: visible; }
+
+#viz-cost .cost-pt {
+  fill: var(--cost-dot);
+  stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; paint-order: stroke;
+}
+#viz-cost .cost-pt.is-hl { fill: var(--c-highlight); }
+#viz-cost .cost-frontier {
+  fill: none; stroke: var(--c-highlight); stroke-opacity: 0.5; stroke-width: 2px;
+  stroke-linejoin: round; stroke-linecap: round;
+}
+#viz-cost .cost-minor line { stroke: var(--axis); stroke-width: 1px; shape-rendering: crispEdges; }
+
+#viz-cost .cost-label {
+  font-size: 12px; font-weight: 500; fill: var(--ink-2);
+  stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; paint-order: stroke;
+}
+#viz-cost .cost-label.is-hl { font-weight: 600; fill: var(--ink); }
+#viz-cost .cost-label .cost-label-val { font-weight: 400; fill: var(--ink-3); }
+#viz-cost .cost-label .cost-label-sub { font-size: 11px; font-weight: 400; fill: var(--ink-3); }
+#viz-cost .cost-leader { stroke: var(--ink-3); stroke-width: 1px; }
+#viz-cost .cost-frontier-label {
+  font-size: 11.5px; font-weight: 500; fill: var(--ink-3); letter-spacing: 0.01em;
+  stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; paint-order: stroke;
+}
+
+#viz-cost .cost-ring { fill: none; stroke: var(--ink); stroke-width: 1.5px; pointer-events: none; }
+/* focusable targets (r = 12): only keyboard / AT can focus them, mouse-down is cancelled */
+#viz-cost .cost-hit-pt { fill: transparent; stroke: none; pointer-events: all; outline: none; }
+#viz-cost .cost-hit-pt:focus { outline: none; stroke: var(--accent); stroke-width: 2px; }
+
+#viz-cost .cost-fade { transition: opacity 0.24s var(--ease); }
+#viz-cost .cost-hide { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  #viz-cost .cost-fade { transition: none; }
+}
+
+/* ---------- data-table twin: fit the card at desktop widths ---------- */
+#viz-cost .viz-table .dtable th,
+#viz-cost .viz-table .dtable td { padding-left: 8px; padding-right: 8px; }
+#viz-cost .viz-table .dtable th:first-child,
+#viz-cost .viz-table .dtable td:first-child { padding-left: 0; }
+#viz-cost .viz-table .dtable th:last-child,
+#viz-cost .viz-table .dtable td:last-child { padding-right: 0; }
+/* on phones the table scrolls sideways inside .table-scroll; keep its caption readable
+   by wrapping it to the visible width and pinning it to the left edge */
+#viz-cost .viz-table { container-type: inline-size; }
+#viz-cost .viz-table .dtable caption { position: sticky; left: 0; max-width: 100cqw; }
+/* row headers (tbody th) read as cells, not as column headers */
+#viz-cost .viz-table .dtable tbody th {
+  white-space: normal; min-width: 7.5em; vertical-align: top;
+  font-size: inherit; font-weight: 500; color: var(--ink); letter-spacing: 0;
+  border-bottom-color: var(--line);
+}
+
+/* ---------- tooltip body (the shared .sb-tip is appended to <body>) ---------- */
+.cost-tip .cost-tip-title { display: flex; align-items: center; gap: 7px; }
+.cost-tip .cost-tip-icon { display: block; flex: none; overflow: visible; }
+.cost-tip .cost-tip-icon path { fill: var(--cost-dot); }
+.cost-tip .cost-tip-icon.is-hl path { fill: var(--c-highlight); }
+
+/* ---------- small screens ---------- */
+@media (max-width: 480px) {
+  #viz-cost.viz-card { padding: 16px 14px 12px; }
+  #viz-cost .cost-legend { gap: 4px 12px; }
+}

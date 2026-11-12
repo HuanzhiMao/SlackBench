@@ -1,0 +1,319 @@
+/* ==========================================================================
+   hero.css — hero illustration (#hero-art). Class prefix: ha-
+   Decorative only (the mount is aria-hidden). Every color is a site.css token
+   (or a color-mix of tokens), so light/dark themes follow automatically.
+
+   Composition (all widths): the question sits over the chat; the repository sits
+   below the chat on the left; the meeting notes hang on the right, their open
+   action item just below the repository; the answer sits under the notes.
+   The agent's path drops into the chat, hops to a commit link, dives into the
+   repository, runs down the branch lane, crosses to the notes and drops to the
+   answer, so it travels through gaps and padding rather than across labels.
+   The drawing follows its own width (container query on #hero-art):
+     ≥ 640px wide · 400–639px regular · < 400px compact (phones)
+   hero.js re-aligns the notes and the answer to the repository after layout.
+   ========================================================================== */
+
+#hero-art {
+  container: ha-art / inline-size;
+  min-height: 508px; /* reserve the drawing's height before hero.js runs (no layout shift) */
+  --ha-sk: color-mix(in srgb, var(--ink) 8%, var(--surface));
+  --ha-sk-2: color-mix(in srgb, var(--ink) 17%, var(--surface));
+  --ha-hit: var(--accent-soft);
+  --ha-hit-soft: color-mix(in srgb, var(--accent-soft) 55%, var(--surface));
+  --ha-ring: color-mix(in srgb, var(--accent) 48%, transparent);
+}
+@media (max-width: 431px) { #hero-art { min-height: 404px; } }
+#hero-art.ha-on { min-height: 0; }
+
+#hero-art .ha-stage {
+  position: relative;
+  height: 508px;
+  max-width: 760px; /* single-column hero: keep the vignette compact, aligned with the text */
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.25;
+  color: var(--ink);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* faint dot field that fades out toward the edges */
+#hero-art .ha-backdrop {
+  position: absolute; inset: -28px 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle at center, var(--axis) 0.9px, transparent 1.3px);
+  background-size: 18px 18px;
+  background-position: center;
+  -webkit-mask-image: radial-gradient(closest-side, var(--ink) 25%, transparent 100%);
+  mask-image: radial-gradient(closest-side, var(--ink) 25%, transparent 100%);
+  opacity: 0.7;
+}
+
+/* ---------- panels ---------- */
+#hero-art .ha-panel {
+  position: absolute; z-index: 1; overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+#hero-art .ha-chat {
+  left: 0; top: 54px; width: 80%; height: 236px;
+  display: grid; grid-template-columns: minmax(154px, 39%) minmax(0, 1fr);
+}
+#hero-art .ha-repo { z-index: 2; left: 5%; top: 306px; width: 58%; }
+#hero-art .ha-doc { z-index: 3; right: 0; top: 196px; width: 34%; }
+
+/* small mono caps label (matches the site's kicker / example labels) */
+#hero-art .ha-label {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--ink-3); white-space: nowrap;
+}
+#hero-art .ha-mono { font-family: var(--font-mono); }
+
+#hero-art .ha-ico {
+  width: 12px; height: 12px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5;
+  stroke-linecap: round; stroke-linejoin: round; color: var(--ink-3);
+}
+
+/* skeleton text */
+#hero-art .ha-sk {
+  display: block; flex: 0 1 auto; height: 6px; max-width: 100%; border-radius: 3px;
+  background: var(--ha-sk);
+}
+#hero-art .ha-sk--name { height: 7px; background: var(--ha-sk-2); }
+#hero-art .ha-sk--time { height: 5px; }
+
+/* avatars: tinted with a category hue, initials in ink */
+#hero-art .ha-av {
+  flex: none; display: inline-grid; place-items: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.02em; line-height: 1; color: var(--ink-2);
+  background: color-mix(in srgb, var(--c, var(--ink-3)) 26%, var(--surface));
+}
+#hero-art .ha-av--xs { width: 16px; height: 16px; box-shadow: 0 0 0 2px var(--surface); }
+#hero-art .ha-av--dot { width: 12px; height: 12px; }
+
+/* ---------- chat: channel list ---------- */
+#hero-art .ha-side {
+  min-width: 0; overflow: hidden; padding-top: 12px;
+  background: var(--bg-soft); border-right: 1px solid var(--line-2);
+}
+#hero-art .ha-side > .ha-label { padding: 0 13px 6px; }
+#hero-art .ha-side > .ha-label--dm { margin-top: 10px; }
+#hero-art .ha-ch {
+  display: flex; align-items: center; gap: 5px; height: 24px; margin: 0 5px; padding: 0 7px 0 8px;
+  border-radius: 6px; font-size: 11.5px; color: var(--ink-2); white-space: nowrap;
+  transition: background-color 0.35s var(--ease), box-shadow 0.35s var(--ease), color 0.35s;
+}
+#hero-art .ha-hash { flex: none; color: var(--ink-3); font-weight: 500; }
+#hero-art .ha-ch-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#hero-art .ha-sock {
+  flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  opacity: 0; transform: scale(0.3); transition: opacity 0.3s, transform 0.3s var(--ease);
+}
+#hero-art .ha-ch.is-on, #hero-art .ha-ch.is-done { background: var(--ha-hit); color: var(--ink); }
+#hero-art .ha-ch.is-on { box-shadow: inset 0 0 0 1px var(--ha-ring); }
+#hero-art .ha-ch.is-on .ha-sock, #hero-art .ha-ch.is-done .ha-sock { opacity: 1; transform: none; }
+#hero-art .ha-dm { display: flex; align-items: center; gap: 8px; height: 22px; padding: 0 13px; }
+
+/* ---------- chat: open channel ---------- */
+#hero-art .ha-main { min-width: 0; overflow: hidden; }
+#hero-art .ha-main-h {
+  display: flex; align-items: center; gap: 4px; height: 37px; padding: 0 12px;
+  border-bottom: 1px solid var(--line-2); font-size: 12.5px; font-weight: 600; white-space: nowrap;
+}
+#hero-art .ha-main-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+#hero-art .ha-members { display: flex; margin-left: auto; padding-left: 8px; }
+#hero-art .ha-members .ha-av + .ha-av { margin-left: -4px; }
+#hero-art .ha-msg {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 9px;
+  margin: 3px 5px 0; padding: 6px 7px 5px; border-radius: 8px;
+  transition: background-color 0.35s var(--ease);
+}
+#hero-art .ha-main-h + .ha-msg { margin-top: 5px; }
+#hero-art .ha-msg.is-on, #hero-art .ha-msg.is-done { background: var(--ha-hit-soft); }
+#hero-art .ha-body { display: grid; gap: 6px; align-content: start; min-width: 0; padding-top: 1px; }
+#hero-art .ha-meta { display: flex; align-items: center; gap: 6px; height: 12px; }
+#hero-art .ha-badge {
+  font-family: var(--font-mono); font-size: 8.5px; font-weight: 500; line-height: 1; letter-spacing: 0.04em;
+  padding: 2px 4px; border-radius: 4px; color: var(--ink-2); background: var(--bg-sunken);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+#hero-art .ha-link {
+  justify-self: start; display: inline-flex; align-items: center; gap: 5px; max-width: 100%;
+  height: 21px; padding: 0 7px 0 5px; margin-top: 1px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--bg-soft);
+  font-size: 10.5px; font-weight: 500; color: var(--ink-2); white-space: nowrap; overflow: hidden;
+  transition: background-color 0.35s, border-color 0.35s, color 0.35s;
+}
+#hero-art .ha-link > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* zero-size anchors where the agent's path touches an element's left edge */
+#hero-art .ha-pin { position: absolute; left: 0; top: 50%; width: 0; height: 0; }
+#hero-art .ha-link--commit, #hero-art .ha-task { position: relative; }
+#hero-art .ha-link--commit.is-on, #hero-art .ha-link--commit.is-done {
+  border-color: var(--ha-ring); background: var(--ha-hit); color: var(--ink);
+}
+#hero-art .ha-link--commit.is-on .ha-ico, #hero-art .ha-link--commit.is-done .ha-ico { color: var(--accent); }
+
+/* ---------- repository: short log with one branch, footer aligned to the text column ---------- */
+#hero-art .ha-log { position: relative; padding: 7px 0 5px; }
+#hero-art .ha-graph { position: absolute; left: 14px; top: 7px; overflow: visible; }
+#hero-art .ha-g-main, #hero-art .ha-g-feat { fill: none; stroke-width: 1.5; stroke-linecap: round; }
+#hero-art .ha-g-main { stroke: var(--axis); }
+#hero-art .ha-g-feat { stroke: var(--c-ci); }
+#hero-art .ha-g-dot { stroke: var(--surface); stroke-width: 2; fill: var(--ink-3); transition: fill 0.3s; }
+#hero-art .ha-g-dot--feat { fill: var(--c-ci); }
+#hero-art .ha-g-dot.is-on, #hero-art .ha-g-dot.is-done { fill: var(--accent); }
+#hero-art .ha-commit {
+  display: flex; align-items: center; gap: 10px; height: 22px; margin: 0 6px; padding: 0 9px 0 38px;
+  border-radius: 6px; transition: background-color 0.35s var(--ease);
+}
+#hero-art .ha-hashid { flex: none; font-size: 10.5px; color: var(--ink-3); transition: color 0.35s; }
+#hero-art .ha-commit.is-on, #hero-art .ha-commit.is-done { background: var(--ha-hit); }
+#hero-art .ha-commit.is-on .ha-hashid, #hero-art .ha-commit.is-done .ha-hashid { color: var(--ink); }
+#hero-art .ha-foot {
+  display: flex; align-items: center; gap: 6px; height: 31px; margin-top: 2px; padding: 0 15px 0 44px;
+  border-top: 1px solid var(--line-2); font-size: 10.5px; color: var(--ink-2); white-space: nowrap;
+  transition: background-color 0.35s var(--ease), color 0.35s;
+}
+#hero-art .ha-foot-branch { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: var(--ink-3); }
+#hero-art .ha-foot.is-on, #hero-art .ha-foot.is-done { background: var(--ha-hit-soft); color: var(--ink); }
+
+/* ---------- notes: a page that ends in action items ---------- */
+#hero-art .ha-ph {
+  display: flex; align-items: center; gap: 6px; height: 33px; padding: 0 12px;
+  border-bottom: 1px solid var(--line-2); white-space: nowrap;
+}
+#hero-art .ha-ph-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 600; color: var(--ink); }
+#hero-art .ha-page { padding: 11px 12px 9px; }
+#hero-art .ha-sk--title { height: 9px; margin-bottom: 12px; background: var(--ha-sk-2); }
+#hero-art .ha-para { display: grid; gap: 7px; margin-bottom: 14px; }
+#hero-art .ha-para .ha-sk:nth-child(n + 8) { display: none; }
+#hero-art .ha-page .ha-label { margin-bottom: 6px; }
+#hero-art .ha-task {
+  display: flex; align-items: center; gap: 7px; height: 22px; margin: 0 -6px; padding: 0 6px;
+  border-radius: 6px; transition: background-color 0.35s var(--ease);
+}
+#hero-art .ha-task .ha-av { margin-left: auto; }
+#hero-art .ha-box {
+  flex: none; display: grid; place-items: center; width: 11px; height: 11px; border-radius: 3px;
+  box-shadow: inset 0 0 0 1.5px var(--axis); transition: box-shadow 0.3s, background-color 0.3s;
+}
+#hero-art .ha-box .ha-ico { width: 9px; height: 9px; stroke-width: 2.2; color: var(--surface); }
+#hero-art .ha-task.is-checked .ha-box { background: var(--ink-3); box-shadow: none; }
+#hero-art .ha-task.is-checked .ha-sk { opacity: 0.55; }
+#hero-art .ha-task.is-on, #hero-art .ha-task.is-done { background: var(--ha-hit); }
+#hero-art .ha-task.is-on .ha-box, #hero-art .ha-task.is-done .ha-box { box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+/* ---------- question & answer chips ---------- */
+#hero-art .ha-chip {
+  position: absolute; z-index: 5; display: inline-flex; align-items: center; gap: 9px;
+  height: 38px; padding: 0 16px 0 8px; border-radius: 999px;
+  background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+  font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap;
+}
+#hero-art .ha-q { left: 0; top: 0; }
+#hero-art .ha-a { right: 0; top: 468px; padding-right: 9px; }
+#hero-art .ha-q-mark {
+  display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--ink); color: var(--bg); font-size: 12px; font-weight: 600;
+}
+/* output port on the question's lower edge; hero.js centers it over the target channel */
+#hero-art .ha-port {
+  position: absolute; left: 50%; bottom: -6px; width: 11px; height: 11px; margin-left: -5.5px;
+  border-radius: 50%; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--axis);
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+#hero-art .ha-q.is-on .ha-port, #hero-art .ha-q.is-done .ha-port {
+  background: var(--accent); box-shadow: 0 0 0 2px var(--surface);
+}
+#hero-art .ha-check {
+  display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--axis); transition: background-color 0.35s, box-shadow 0.35s;
+}
+#hero-art .ha-check .ha-ico {
+  width: 14px; height: 14px; stroke-width: 2; color: var(--on-accent);
+  stroke-dasharray: 12; stroke-dashoffset: 12; transition: stroke-dashoffset 0.45s var(--ease) 0.12s;
+}
+#hero-art .ha-a .ha-txt { color: var(--ink-3); transition: color 0.35s; }
+#hero-art .ha-owners { display: flex; gap: 3px; margin-left: 2px; }
+#hero-art .ha-owners .ha-av {
+  width: 22px; height: 22px; color: transparent; background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px var(--line), 0 0 0 2px var(--surface);
+  transition: background-color 0.35s, color 0.35s, box-shadow 0.35s;
+}
+#hero-art .ha-owners .ha-av + .ha-av { transition-delay: 0.12s; }
+#hero-art .ha-a.is-on .ha-check, #hero-art .ha-a.is-done .ha-check { background: var(--accent); box-shadow: none; }
+#hero-art .ha-a.is-on .ha-check .ha-ico, #hero-art .ha-a.is-done .ha-check .ha-ico { stroke-dashoffset: 0; }
+#hero-art .ha-a.is-on .ha-txt, #hero-art .ha-a.is-done .ha-txt { color: var(--ink); }
+#hero-art .ha-a.is-on .ha-owners .ha-av, #hero-art .ha-a.is-done .ha-owners .ha-av {
+  color: var(--ink-2);
+  background: color-mix(in srgb, var(--c, var(--ink-3)) 26%, var(--surface));
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
+/* ---------- the agent's path ---------- */
+#hero-art .ha-trace { position: absolute; left: 0; top: 0; z-index: 4; overflow: visible; pointer-events: none; }
+#hero-art .ha-trail, #hero-art .ha-trail-case { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+#hero-art .ha-trail { stroke: var(--accent); stroke-width: 2; }
+#hero-art .ha-trail-case { stroke: var(--surface); stroke-width: 6; }
+#hero-art .ha-ripple { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0; }
+#hero-art .ha-agent {
+  position: absolute; left: 0; top: 0; z-index: 6; width: 12px; height: 12px; margin: -6px 0 0 -6px;
+  border-radius: 50%; background: var(--accent); pointer-events: none; opacity: 0; will-change: transform;
+  box-shadow: 0 0 0 2.5px var(--surface), 0 0 0 8px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* ---------- wide: full-width column under the hero text (tablets) ---------- */
+@container ha-art (min-width: 640px) {
+  #hero-art .ha-chat { width: 57%; }
+  #hero-art .ha-repo { left: 4%; width: 47%; }
+  #hero-art .ha-doc { width: 37%; top: 106px; }
+  #hero-art .ha-para .ha-sk:nth-child(n + 8) { display: block; }
+}
+
+/* ---------- compact: phones ---------- */
+@container ha-art (max-width: 399px) {
+  #hero-art .ha-stage { height: 404px; }
+  #hero-art .ha-chip { height: 34px; gap: 8px; padding: 0 13px 0 6px; font-size: 12.5px; }
+  #hero-art .ha-q-mark, #hero-art .ha-check, #hero-art .ha-owners .ha-av { width: 20px; height: 20px; }
+  #hero-art .ha-q-mark { font-size: 11px; }
+  #hero-art .ha-a { top: 366px; padding-right: 7px; }
+
+  #hero-art .ha-chat { top: 46px; width: 100%; height: 178px; grid-template-columns: 50% minmax(0, 1fr); }
+  #hero-art .ha-side { padding-top: 11px; }
+  #hero-art .ha-side > .ha-label { padding: 0 11px 6px; }
+  #hero-art .ha-ch { margin: 0 4px; padding: 0 6px 0 7px; font-size: 11px; }
+  #hero-art .ha-ch:nth-child(6), #hero-art .ha-side > .ha-label--dm, #hero-art .ha-dm { display: none; }
+  #hero-art .ha-main-h { height: 34px; padding: 0 10px; font-size: 12px; }
+  #hero-art .ha-members, #hero-art .ha-msg--extra { display: none; }
+  #hero-art .ha-msg { grid-template-columns: 20px minmax(0, 1fr); gap: 7px; margin: 3px 3px 0; padding: 6px 6px 5px; }
+  #hero-art .ha-msg .ha-av { width: 20px; height: 20px; font-size: 8.5px; }
+
+  #hero-art .ha-repo { left: 0; top: 240px; width: 54%; }
+  #hero-art .ha-graph { left: 10px; }
+  #hero-art .ha-commit { margin: 0 4px; padding: 0 8px 0 36px; }
+  #hero-art .ha-foot { display: none; }
+
+  #hero-art .ha-doc { top: 261px; width: 43%; }
+  #hero-art .ha-ph { height: 30px; padding: 0 10px; }
+  #hero-art .ha-page { padding: 9px 10px 8px; }
+  #hero-art .ha-sk--title, #hero-art .ha-para, #hero-art .ha-page .ha-label, #hero-art .ha-task.is-checked { display: none; }
+}
+
+/* ---------- pause / play control (outside the aria-hidden drawing) ---------- */
+.hero-art-wrap { position: relative; min-width: 0; }
+.hero-motion {
+  position: absolute; left: 0; bottom: 0; z-index: 2; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; padding: 0;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); box-shadow: var(--shadow-sm);
+  transition: color 0.15s, border-color 0.15s;
+}
+.hero-motion:hover { color: var(--ink); border-color: var(--axis); }
+.hero-motion:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hero-motion svg { width: 13px; height: 13px; }
+.hero-motion .i-play { display: none; }
+.hero-motion[aria-pressed="true"] .i-play { display: block; }
+.hero-motion[aria-pressed="true"] .i-pause { display: none; }
+.hero-motion[hidden] { display: none; }

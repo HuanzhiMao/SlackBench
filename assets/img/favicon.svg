@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .b{fill:#15171c}.h{fill:#fff}.s{stroke:#fff}.a{fill:#1f5ad6}
+    @media (prefers-color-scheme: dark){.b{fill:#eef1f5}.h{fill:#0e1013}.s{stroke:#0e1013}.a{fill:#8db4ff}}
+  </style>
+  <path class="b" d="M8 3.5h16A5.5 5.5 0 0 1 29.5 9v10a5.5 5.5 0 0 1-5.5 5.5h-9l-5.3 4.2a.8.8 0 0 1-1.3-.7l.5-3.5H8A5.5 5.5 0 0 1 2.5 19V9A5.5 5.5 0 0 1 8 3.5z"/>
+  <g class="s" fill="none" stroke-width="2" stroke-linecap="round"><path d="M11 9.5v9"/><path d="M11 16.2c0-3.1 2.2-4.7 6.6-4.7h1.4"/></g>
+  <circle class="h" cx="11" cy="9.5" r="2.1"/>
+  <circle class="h" cx="11" cy="18.5" r="2.1"/>
+  <circle class="a" cx="21.2" cy="11.5" r="2.5"/>
+</svg>

@@ -1,0 +1,104 @@
+/* findings-b.css — Findings 01, 05, 06, 07
+   (#viz-human, #viz-harness, #viz-answer-first, #viz-validity; class prefix fb-).
+   Colors are site.css tokens only, so both themes work without overrides. */
+
+/* ---------- chart body + overlay ---------- */
+.fb-body { position: relative; }
+.fb-body > svg { display: block; overflow: visible; }
+.fb-legend { margin: -2px 0 16px; }
+.fb-key { flex: none; overflow: visible; }
+
+.fb-hits { position: absolute; inset: 0; pointer-events: none; }
+.fb-hit {
+  position: absolute; pointer-events: auto; border-radius: 8px;
+  touch-action: pan-y; -webkit-tap-highlight-color: transparent;
+}
+.fb-hit--dot { border-radius: 50%; }
+.fb-hit:focus { outline: none; }
+.fb-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ---------- text in charts (text wears ink tokens, never data colors) ---------- */
+.fb-svg .fb-name { fill: var(--ink); font-size: 13px; font-weight: 500; }
+.fb-svg .fb-name .fb-muted { fill: var(--ink-3); font-weight: 400; font-size: 12.5px; }
+.fb-svg .fb-lab { font-size: 12px; }
+.fb-svg .fb-k { fill: var(--ink-3); font-weight: 400; }
+.fb-svg .fb-v { fill: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.fb-svg .fb-hlab { fill: var(--ink-2); font-size: 12px; }
+.fb-svg .fb-halo { paint-order: stroke fill; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+
+/* ---------- marks ---------- */
+/* dots/markers: 2px ring in the surface color (stroke under the fill) */
+.fb-dot, .fb-mark { stroke: var(--surface); stroke-width: 4px; paint-order: stroke fill; stroke-linejoin: round; }
+.fb-dot--agent { fill: var(--c-muted); }
+.fb-dot--best { fill: var(--c, var(--c-overall)); }
+.fb-mark, .fb-mark-key { fill: var(--c-overall); }
+.fb-human { stroke: var(--c-human); stroke-width: 2px; stroke-linecap: round; fill: none; }
+.fb-human--hi { stroke-width: 4px; }
+.fb-ci { fill: var(--c-human); fill-opacity: 0.075; }
+.fb-ci--key { fill-opacity: 0.14; }
+.fb-ring { fill: none; stroke: var(--ink); stroke-width: 1.5px; }
+.fb-ring--echo { stroke: var(--ink-3); stroke-width: 1.25px; }
+.fb-conn { stroke: var(--c-muted); stroke-width: 2px; stroke-linecap: round; }
+.fb-bar { fill: var(--c-ha); transition: opacity 0.15s; }
+.fb-bar.is-hi { opacity: 0.82; }
+/* dumbbell: ours = filled dot, official = ring */
+.fb-on { fill: var(--c-overall); stroke: var(--surface); stroke-width: 2px; paint-order: stroke fill; }
+.fb-on--key { stroke: none; }
+.fb-off { fill: var(--surface); stroke: var(--c-overall); stroke-width: 2px; }
+
+/* ---------- table twins inside these cards ---------- */
+/* caption shown above the scroll box (the real <caption> is kept for assistive tech) */
+.fb-card .viz-table .fb-cap { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-3); max-width: 64ch; }
+.fb-card .viz-table .table-scroll { margin-top: 6px; }
+/* headers may wrap; row-header cells read as cells (light rule, top-aligned), not as headers */
+.fb-card .viz-table .dtable thead th { white-space: normal; }
+.fb-card .viz-table .dtable tbody th { vertical-align: top; border-bottom-color: var(--line); font-weight: 500; color: var(--ink); }
+.fb-card .viz-table .dtable td, .fb-card .viz-table .dtable tbody th { white-space: nowrap; }
+.fb-card .viz-table .dtable .fb-wrap { white-space: normal; min-width: 8.5em; }
+
+/* ---------- 07 · validity: stat tiles, matrix, panels ---------- */
+#viz-validity .fb-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 2px; }
+#viz-validity .fb-tile { padding: 2px 20px 2px 0; min-width: 0; }
+#viz-validity .fb-tile + .fb-tile { padding: 2px 0 2px 20px; border-left: 1px solid var(--line); }
+#viz-validity .fb-tile p { margin: 0; }
+#viz-validity .fb-tile-v {
+  font-size: 40px; font-weight: 600; letter-spacing: -0.03em; line-height: 1; color: var(--ink);
+}
+#viz-validity .fb-tile-l { margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+#viz-validity .fb-tile-n { margin-top: 4px; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+#viz-validity.fb-narrow .fb-tiles { grid-template-columns: 1fr; }
+#viz-validity.fb-narrow .fb-tile,
+#viz-validity.fb-narrow .fb-tile + .fb-tile { padding: 0; border-left: 0; }
+#viz-validity.fb-narrow .fb-tile + .fb-tile { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+#viz-validity.fb-narrow .fb-tile-v { font-size: 34px; }
+
+#viz-validity .fb-sec { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+#viz-validity .fb-sec--matrix { padding-top: 12px; }
+#viz-validity .fb-sec-h { margin: 0; font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.35; }
+#viz-validity .fb-sec-n { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); line-height: 1.45; }
+#viz-validity .fb-legend--mcp { margin: 12px 0 4px; }
+
+#viz-validity .fb-matrix { font-size: 13.5px; max-width: 460px; }
+#viz-validity .fb-matrix caption { font-size: 13px; padding-bottom: 6px; }
+#viz-validity .fb-matrix th, #viz-validity .fb-matrix td { padding: 7px 10px; }
+#viz-validity .fb-matrix thead th { white-space: normal; }
+#viz-validity .fb-matrix .fb-nw { white-space: nowrap; }
+#viz-validity.fb-narrow .fb-matrix { font-size: 13px; }
+#viz-validity.fb-narrow .fb-matrix th, #viz-validity.fb-narrow .fb-matrix td { padding: 7px 6px; }
+#viz-validity.fb-narrow .fb-matrix tbody th { white-space: normal; }
+#viz-validity .fb-matrix tr > :first-child { padding-left: 0; }
+#viz-validity .fb-matrix tr > :last-child { padding-right: 0; }
+#viz-validity .fb-matrix tbody th { border-bottom-color: var(--line); font-weight: 500; color: var(--ink); white-space: nowrap; }
+#viz-validity .fb-matrix td { font-variant-numeric: tabular-nums; }
+#viz-validity .fb-matrix .fb-cell { font-weight: 600; }
+#viz-validity .fb-matrix .fb-diag { color: var(--ink-3); }
+#viz-validity .fb-matrix .fb-na { color: var(--faint); }
+
+#viz-validity .fb-panels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; margin-top: 12px; }
+#viz-validity .fb-panels.is-stacked { grid-template-columns: 1fr; }
+#viz-validity .fb-panel { min-width: 0; }
+#viz-validity .fb-panel-h {
+  display: flex; align-items: center; gap: 7px; margin: 0 0 8px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink-2); letter-spacing: 0.01em;
+}
+#viz-validity .fb-panel-sub { font-weight: 400; color: var(--ink-3); }

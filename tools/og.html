@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=1200">
+  <title>SlackBench social card</title>
+  <!--
+    Social card source (1200 × 630). Self-contained: the site's self-hosted Geist fonts + inline CSS, plus a
+    small inline script that draws the agent's path from the anchors on the page.
+    Render to ../assets/img/og.png at exactly 1200 × 630, device scale factor 1, e.g.
+      Playwright (Chromium): viewport 1200×630, color scheme light, wait for
+      document.fonts.ready and body[data-ready], then page.screenshot().
+    Figures match the paper (data.js): 140 tasks, 33 agents, best agent 80.25%,
+    human researchers (with AI tools) 84.5%.
+  -->
+  <style>
+    /* self-hosted fonts (same files as the site) */
+    @font-face {
+      font-family: "Geist"; font-style: normal; font-weight: 400 700; font-display: block;
+      src: url("../assets/fonts/geist-latin-ext.woff2") format("woff2");
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: "Geist"; font-style: normal; font-weight: 400 700; font-display: block;
+      src: url("../assets/fonts/geist-latin.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+    @font-face {
+      font-family: "Geist Mono"; font-style: normal; font-weight: 400 500; font-display: block;
+      src: url("../assets/fonts/geist-mono-latin-ext.woff2") format("woff2");
+      unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+    }
+    @font-face {
+      font-family: "Geist Mono"; font-style: normal; font-weight: 400 500; font-display: block;
+      src: url("../assets/fonts/geist-mono-latin.woff2") format("woff2");
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+    }
+  </style>
+  <style>
+    /* light tokens, same values as assets/css/site.css */
+    :root {
+      --bg: #ffffff; --bg-soft: #f6f7f9; --bg-sunken: #eef1f5; --surface: #ffffff;
+      --ink: #15171c; --ink-2: #3c424c; --ink-3: #5c6370;
+      --line: #dfe3e9; --line-2: #eceff3; --axis: #c3c9d1;
+      --accent: #1f5ad6; --accent-soft: #e9f0fd; --on-accent: #ffffff;
+      --c-ha: #e87ba4; --c-su: #eda100; --c-ci: #6250d6;
+      --sk: color-mix(in srgb, var(--ink) 8%, var(--surface));
+      --sk-2: color-mix(in srgb, var(--ink) 17%, var(--surface));
+      --ring: color-mix(in srgb, var(--accent) 48%, transparent);
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px rgba(16, 24, 40, 0.08);
+      --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--bg); }
+    body {
+      position: relative; font-family: var(--font-sans); color: var(--ink);
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+
+    /* faint dot field behind the motif, fading out */
+    .field {
+      position: absolute; left: 560px; top: 0; width: 640px; height: 630px;
+      background-image: radial-gradient(circle at center, var(--axis) 1px, transparent 1.5px);
+      background-size: 20px 20px;
+      -webkit-mask-image: radial-gradient(closest-side, #000 30%, transparent 100%);
+      mask-image: radial-gradient(closest-side, #000 30%, transparent 100%);
+      opacity: 0.75;
+    }
+
+    /* ---------- left column ---------- */
+    .copy { position: absolute; left: 72px; top: 64px; width: 560px; height: 500px; display: flex; flex-direction: column; }
+    .eyebrow { display: flex; align-items: center; gap: 12px; font-size: 21px; font-weight: 500; color: var(--ink-2); }
+    .eyebrow i { width: 14px; height: 14px; border-radius: 3.5px; background: var(--accent); }
+    .title { display: flex; align-items: center; gap: 22px; margin-top: 34px; }
+    .title svg { width: 76px; height: 76px; flex: none; color: var(--ink); }
+    .title .bm-hole { fill: var(--bg); }
+    .title .bm-stroke { stroke: var(--bg); }
+    .title .bm-accent { fill: var(--accent); }
+    .title h1 { font-size: 88px; line-height: 0.95; font-weight: 650; letter-spacing: -0.045em; }
+    .sub { margin-top: 26px; font-size: 33px; line-height: 1.22; font-weight: 500; letter-spacing: -0.018em; text-wrap: balance; }
+    .figs { margin-top: auto; display: flex; border-top: 1px solid var(--line); padding-top: 26px; }
+    .fig { padding: 0 30px; border-left: 1px solid var(--line); }
+    .fig:first-child { padding-left: 0; border-left: 0; }
+    .fig b { display: block; font-size: 46px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; }
+    .fig b small { font-size: 0.6em; font-weight: 500; color: var(--ink-3); letter-spacing: 0; margin-left: 2px; }
+    .fig span { display: block; margin-top: 10px; font-size: 18px; line-height: 1.3; color: var(--ink-3); }
+    .fig span em { font-style: normal; color: var(--ink-2); font-weight: 500; }
+
+    /* ---------- right column: the hero motif, simplified and enlarged ---------- */
+    .stage { position: absolute; left: 676px; top: 42px; width: 460px; height: 546px; }
+    .panel {
+      position: absolute; overflow: hidden; background: var(--surface);
+      border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow);
+    }
+    .sk { display: block; height: 8px; border-radius: 4px; background: var(--sk); }
+    .sk.name { height: 9px; background: var(--sk-2); }
+    .label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); }
+    .mono { font-family: var(--font-mono); }
+    .ico { width: 15px; height: 15px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; color: var(--ink-3); }
+    .av {
+      flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+      font-size: 11px; font-weight: 600; color: var(--ink-2);
+      background: color-mix(in srgb, var(--c, var(--ink-3)) 26%, var(--surface));
+    }
+    .av.dot { width: 14px; height: 14px; }
+    [data-cat="HA"] { --c: var(--c-ha); } [data-cat="SU"] { --c: var(--c-su); } [data-cat="CI"] { --c: var(--c-ci); }
+    .pin { position: absolute; left: 0; top: 50%; width: 0; height: 0; }
+
+    .chip {
+      position: absolute; z-index: 5; display: inline-flex; align-items: center; gap: 11px;
+      height: 48px; padding: 0 20px 0 10px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+      font-size: 17px; font-weight: 500; white-space: nowrap;
+    }
+    .q { left: 0; top: 0; }
+    .q-mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 15px; font-weight: 600; }
+    .port { position: absolute; bottom: -7px; width: 13px; height: 13px; margin-left: -6.5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2.5px var(--surface); }
+    .a { right: 0; padding-right: 12px; }
+    .check { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); }
+    .check svg { width: 17px; height: 17px; fill: none; stroke: var(--on-accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .owners { display: flex; gap: 4px; margin-left: 2px; }
+
+    /* chat */
+    .chat { left: 0; top: 74px; width: 416px; height: 214px; display: grid; grid-template-columns: 196px 1fr; }
+    .side { background: var(--bg-soft); border-right: 1px solid var(--line-2); padding-top: 15px; }
+    .side .label { padding: 0 16px 9px; }
+    .ch { position: relative; display: flex; align-items: center; gap: 6px; height: 31px; margin: 0 7px; padding: 0 26px 0 9px; border-radius: 8px; font-size: 14px; color: var(--ink-2); white-space: nowrap; }
+    .ch .n { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .ch .h { color: var(--ink-3); font-weight: 500; }
+    .ch.on { background: var(--accent-soft); color: var(--ink); box-shadow: inset 0 0 0 1px var(--ring); }
+    .ch .sock { position: absolute; right: 10px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--accent); }
+    .main-h { display: flex; align-items: center; gap: 5px; height: 45px; padding: 0 14px; border-bottom: 1px solid var(--line-2); font-size: 15px; font-weight: 600; white-space: nowrap; }
+    .main-h .h { color: var(--ink-3); }
+    .msg { display: grid; grid-template-columns: 28px 1fr; gap: 10px; margin: 6px 6px 0; padding: 8px 8px 7px; border-radius: 10px; }
+    .msg.on { background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); }
+    .body { display: grid; gap: 8px; align-content: start; padding-top: 2px; }
+    .meta { display: flex; align-items: center; gap: 7px; height: 14px; }
+    .badge { font-family: var(--font-mono); font-size: 10px; font-weight: 500; line-height: 1; padding: 3px 5px; border-radius: 5px; color: var(--ink-2); background: var(--bg-sunken); box-shadow: inset 0 0 0 1px var(--line); }
+    .link { position: relative; justify-self: start; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px 0 7px; border-radius: 7px; border: 1px solid var(--line); background: var(--bg-soft); font-size: 13px; font-weight: 500; color: var(--ink-2); }
+    .link.on { border-color: var(--ring); background: var(--accent-soft); color: var(--ink); }
+    .link.on .ico { color: var(--accent); }
+
+    /* repository */
+    .repo { left: 20px; top: 306px; width: 252px; }
+    .log { position: relative; padding: 9px 0 6px; }
+    .graph { position: absolute; left: 16px; top: 9px; overflow: visible; }
+    .commit { display: flex; align-items: center; gap: 12px; height: 28px; margin: 0 7px; padding: 0 10px 0 44px; border-radius: 8px; }
+    .commit.on { background: var(--accent-soft); }
+    .commit .mono { font-size: 13px; color: var(--ink-3); }
+    .commit.on .mono { color: var(--ink); }
+    .foot { display: flex; align-items: center; gap: 7px; height: 38px; margin-top: 3px; padding: 0 16px 0 51px; border-top: 1px solid var(--line-2); background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface)); font-size: 13px; color: var(--ink); white-space: nowrap; }
+    .foot .br { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--ink-3); }
+
+    /* notes */
+    .doc { right: 0; width: 170px; z-index: 2; }
+    .ph { display: flex; align-items: center; gap: 7px; height: 41px; padding: 0 14px; border-bottom: 1px solid var(--line-2); font-size: 14px; font-weight: 600; white-space: nowrap; }
+    .page { padding: 13px 14px 11px; }
+    .page .t { height: 11px; width: 62%; margin-bottom: 14px; background: var(--sk-2); }
+    .para { display: grid; gap: 9px; margin-bottom: 16px; }
+    .page .label { margin-bottom: 8px; }
+    .task { position: relative; display: flex; align-items: center; gap: 8px; height: 28px; margin: 0 -7px; padding: 0 7px; border-radius: 8px; }
+    .task.on { background: var(--accent-soft); }
+    .box { flex: none; display: grid; place-items: center; width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--axis); }
+    .task.on .box { box-shadow: inset 0 0 0 1.5px var(--accent); }
+    .task.done .box { background: var(--ink-3); box-shadow: none; }
+    .task.done .box svg { width: 11px; height: 11px; fill: none; stroke: var(--surface); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .task.done .sk { opacity: 0.55; }
+    .task .av { margin-left: auto; }
+
+    /* the agent's path */
+    .trace { position: absolute; left: 0; top: 0; z-index: 4; overflow: visible; }
+    .trace path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .trace .case { stroke: var(--surface); stroke-width: 8; }
+    .trace .line { stroke: var(--accent); stroke-width: 2.75; }
+  </style>
+</head>
+<body>
+  <div class="field"></div>
+
+  <div class="copy">
+    <p class="eyebrow"><i></i>NeurIPS 2026 · Evaluations &amp; Datasets Track</p>
+    <div class="title">
+      <svg viewBox="0 0 32 32" aria-hidden="true">
+        <path fill="currentColor" d="M8 3.5h16A5.5 5.5 0 0 1 29.5 9v10a5.5 5.5 0 0 1-5.5 5.5h-9l-5.3 4.2a.8.8 0 0 1-1.3-.7l.5-3.5H8A5.5 5.5 0 0 1 2.5 19V9A5.5 5.5 0 0 1 8 3.5z"/>
+        <g class="bm-stroke" fill="none" stroke-width="2" stroke-linecap="round"><path d="M11 9.5v9"/><path d="M11 16.2c0-3.1 2.2-4.7 6.6-4.7h1.4"/></g>
+        <circle class="bm-hole" cx="11" cy="9.5" r="2.1"/>
+        <circle class="bm-hole" cx="11" cy="18.5" r="2.1"/>
+        <circle class="bm-accent" cx="21.2" cy="11.5" r="2.5"/>
+      </svg>
+      <h1>SlackBench</h1>
+    </div>
+    <p class="sub">Benchmarking agents on collaborative projects grounded in real code repositories</p>
+    <div class="figs">
+      <div class="fig"><b>140</b><span>tasks</span></div>
+      <div class="fig"><b>33</b><span>agents</span></div>
+      <div class="fig"><b>80.25<small>%</small></b><span>best agent, vs. <em>84.5%</em> for humans using AI tools</span></div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <div class="panel chat" id="chat">
+      <div class="side">
+        <div class="label">Channels</div>
+        <div class="ch"><span class="h">#</span><span class="n">bfcl-thousand-tools</span></div>
+        <div class="ch"><span class="h">#</span><span class="n">research-ideagen</span></div>
+        <div class="ch on"><span class="h">#</span><span class="n">tool-bench-langvar</span><i class="sock" id="a-ch"></i></div>
+        <div class="ch"><span class="h">#</span><span class="n">tool-bench-langvar-dev</span></div>
+      </div>
+      <div>
+        <div class="main-h"><span class="h">#</span>tool-bench-langvar</div>
+        <div class="msg">
+          <span class="av" data-cat="HA">MR</span>
+          <div class="body">
+            <div class="meta"><i class="sk name" style="width:56px"></i><i class="sk" style="width:20px;height:6px"></i></div>
+            <i class="sk" style="width:86%"></i>
+          </div>
+        </div>
+        <div class="msg on">
+          <span class="av" data-cat="CI">LT</span>
+          <div class="body">
+            <div class="meta"><i class="sk name" style="width:40px"></i><span class="badge">AI</span></div>
+            <i class="sk" style="width:72%"></i>
+            <span class="link on"><i class="pin" id="a-link"></i><svg class="ico" viewBox="0 0 16 16"><path d="M5.4 8a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0-5.2 0"/><path d="M1.6 8h3.8M10.6 8h3.8"/></svg><span class="mono">a3f9e1c</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel repo" id="repo">
+      <div class="log">
+        <svg class="graph" width="30" height="84" viewBox="0 0 30 84" aria-hidden="true">
+          <path d="M8,42V90" fill="none" stroke="var(--axis)" stroke-width="1.75" stroke-linecap="round"/>
+          <path d="M22,14C22,28 8,28 8,42" fill="none" stroke="var(--c-ci)" stroke-width="1.75" stroke-linecap="round"/>
+          <circle id="a-commit" cx="22" cy="14" r="5" fill="var(--accent)" stroke="var(--surface)" stroke-width="2.5"/>
+          <circle cx="8" cy="42" r="5" fill="var(--ink-3)" stroke="var(--surface)" stroke-width="2.5"/>
+          <circle cx="8" cy="70" r="5" fill="var(--ink-3)" stroke="var(--surface)" stroke-width="2.5"/>
+        </svg>
+        <div class="commit on"><span class="mono">a3f9e1c</span><i class="sk" style="width:62%"></i></div>
+        <div class="commit"><span class="mono">e40b9d7</span><i class="sk" style="width:46%"></i></div>
+        <div class="commit"><span class="mono">7b2d0e4</span><i class="sk" style="width:56%"></i></div>
+      </div>
+      <div class="foot">
+        <svg class="ico" viewBox="0 0 16 16"><path d="M4 1.8h5.2l3.3 3.3v9.1H4z"/><path d="M9.2 1.8v3.3h3.3"/></svg><span class="mono">TODO.md</span>
+        <span class="br"><svg class="ico" viewBox="0 0 16 16"><path d="M5 4.6v6.8"/><path d="M11 6.4c0 2.5-2.2 3.1-6 3.9"/><path d="M3.6 3.4a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0-2.8 0"/><path d="M3.6 12.6a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0-2.8 0"/><path d="M9.6 5a1.4 1.4 0 1 0 2.8 0a1.4 1.4 0 1 0-2.8 0"/></svg><span class="mono">main</span></span>
+      </div>
+    </div>
+
+    <div class="panel doc" id="doc">
+      <div class="ph"><svg class="ico" viewBox="0 0 16 16"><path d="M4 1.8h5.2l3.3 3.3v9.1H4z"/><path d="M9.2 1.8v3.3h3.3"/><path d="M6.2 8.6h4.2M6.2 11.2h2.8"/></svg>Meeting notes</div>
+      <div class="page">
+        <i class="sk t"></i>
+        <div class="para"><i class="sk" style="width:94%"></i><i class="sk" style="width:64%"></i></div>
+        <div class="label">Action items</div>
+        <div class="task done"><span class="box"><svg viewBox="0 0 16 16"><path d="M3.8 8.4l2.7 2.7 5.7-5.9"/></svg></span><i class="sk" style="width:52%"></i><span class="av dot" data-cat="CI"></span></div>
+        <div class="task on"><span class="box"></span><i class="sk" style="width:46%"></i><span class="av dot" data-cat="HA"></span></div>
+        <div class="task on" id="target"><i class="pin" id="a-task"></i><span class="box"></span><i class="sk" style="width:40%"></i><span class="av dot" data-cat="SU"></span></div>
+      </div>
+    </div>
+
+    <svg class="trace" id="trace" aria-hidden="true"><path class="case" id="case"/><path class="line" id="line"/></svg>
+
+    <div class="chip q" id="q"><span class="q-mark">?</span>Who owns the remaining TODOs?<i class="port" id="a-q"></i></div>
+    <div class="chip a" id="ans"><span class="check" id="a-ans"><svg viewBox="0 0 16 16"><path d="M3.8 8.4l2.7 2.7 5.7-5.9"/></svg></span>Answer<span class="owners"><span class="av" data-cat="HA">MR</span><span class="av" data-cat="SU">SK</span></span></div>
+  </div>
+
+  <script>
+    /* Static layout pass: put the notes' open item just under the repository and the answer
+       under the notes, aim the question's port at the channel, then draw the agent's path
+       (same hop shapes as assets/js/hero.js). */
+    (function () {
+      "use strict";
+      function $(id) { return document.getElementById(id); }
+      function go() {
+        var stage = $("stage"), sr = stage.getBoundingClientRect();
+        var c = function (el) { var r = el.getBoundingClientRect(); return { x: r.left + r.width / 2 - sr.left, y: r.top + r.height / 2 - sr.top }; };
+        var repoBottom = $("repo").getBoundingClientRect().bottom - sr.top;
+        var doc = $("doc");
+        doc.style.top = "0px";
+        doc.style.top = Math.round(repoBottom + 16 - c($("a-task")).y) + "px";
+        var ans = $("ans");
+        ans.style.top = Math.round(doc.offsetTop + doc.offsetHeight + 16) + "px";
+        var q = $("q"), qr = q.getBoundingClientRect();
+        $("a-q").style.left = Math.round(c($("a-ch")).x + sr.left - qr.left - 1) + "px";
+
+        var P = ["a-q", "a-ch", "a-link", "a-commit", "a-task", "a-ans"].map(function (id) { return c($(id)); });
+        var lane = { x: P[3].x, y: repoBottom + 10 };
+        var D = [0, 1], R = [1, 0];
+        function piece(A, B, o, i, k1, k2) {
+          var dx = B.x - A.x, dy = B.y - A.y;
+          var h1 = Math.max(10, k1 * Math.abs(dx * o[0] + dy * o[1])), h2 = Math.max(10, k2 * Math.abs(dx * i[0] + dy * i[1]));
+          return "C" + (A.x + o[0] * h1) + "," + (A.y + o[1] * h1) + " " + (B.x - i[0] * h2) + "," + (B.y - i[1] * h2) + " " + B.x + "," + B.y;
+        }
+        var d = "M" + P[0].x + "," + P[0].y +
+          piece(P[0], P[1], D, D, 0.45, 0.45) + piece(P[1], P[2], D, R, 0.9, 0.7) + piece(P[2], P[3], D, D, 0.9, 0.9) +
+          piece(P[3], lane, D, D, 0.4, 0.4) + piece(lane, P[4], D, R, 1, 0.5) + piece(P[4], P[5], D, D, 0.5, 0.5);
+        var svg = $("trace");
+        svg.setAttribute("width", sr.width); svg.setAttribute("height", sr.height);
+        svg.setAttribute("viewBox", "0 0 " + sr.width + " " + sr.height);
+        $("case").setAttribute("d", d); $("line").setAttribute("d", d);
+        document.body.setAttribute("data-ready", "1");
+      }
+      (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(go);
+    })();
+  </script>
+</body>
+</html>

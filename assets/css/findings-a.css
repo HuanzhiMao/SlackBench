@@ -1,0 +1,118 @@
+/* findings-a.css — Finding 02 (#viz-cli-mcp, #viz-toolcalls) and Finding 04 (#viz-effort).
+   Prefix: fa-. Colors come only from site.css tokens, so both themes follow automatically.
+   Two-series encoding shared by charts 1 and 2:
+     MCP tools     = a mid gray mixed from --c-overall (hollow ring / gray bar)
+     Files via CLI = --c-highlight (filled dot / blue bar)                                  */
+
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) {
+  --fa-cli: var(--c-highlight);
+  --fa-mcp: color-mix(in srgb, var(--c-overall) 55%, var(--surface));
+  --fa-hover: color-mix(in srgb, var(--ink) 5%, var(--surface));
+}
+@supports not (color: color-mix(in srgb, red 50%, blue)) {
+  :is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) { --fa-mcp: var(--ink-3); --fa-hover: var(--bg-soft); }
+}
+
+/* ---------- controls + legend ---------- */
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .fa-controls { justify-content: space-between; }
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .fa-seg button { padding: 6px 11px; font-size: 13px; }
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .fa-seg button:focus-visible { outline-offset: 0; }
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .fa-seg .swatch { width: 8px; height: 8px; border-radius: 2px; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-legend { gap: 6px 14px; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-key { width: 12px; height: 12px; flex: none; overflow: visible; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-key-ring { fill: none; stroke: var(--fa-mcp); stroke-width: 2; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-key-dot { fill: var(--fa-cli); }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-sw-mcp { --c: var(--fa-mcp); }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-sw-cli { --c: var(--fa-cli); }
+
+/* ---------- plot body: hit layer sits under the (pointer-transparent) SVG ---------- */
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-body { position: relative; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-hits { position: absolute; inset: 0; z-index: 0; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-plot { position: relative; z-index: 1; display: block; pointer-events: none; }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-hit {
+  position: absolute; border-radius: 8px; -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.12s;
+}
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-hit:hover,
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-hit.is-on { background: var(--fa-hover); }
+:is(#viz-cli-mcp, #viz-toolcalls) .fa-hit:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; background: var(--fa-hover); }
+
+/* ---------- shared SVG text ---------- */
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) svg text { font-variant-numeric: tabular-nums; }
+#viz-cli-mcp .fa-t-model { fill: var(--ink); font-size: 13px; font-weight: 500; }
+#viz-cli-mcp .fa-t-harness { fill: var(--ink-3); font-size: 12px; font-weight: 400; }
+#viz-cli-mcp .fa-t-colhead { fill: var(--ink-3); font-size: 11.5px; font-weight: 500; }
+#viz-cli-mcp .fa-t-delta { fill: var(--ink); font-size: 12.5px; font-weight: 600; }
+#viz-cli-mcp .fa-t-sum { fill: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+#viz-cli-mcp .fa-glyph { fill: var(--ink-2); }
+#viz-cli-mcp .fa-sum-rule { stroke: var(--line); stroke-width: 1; shape-rendering: crispEdges; }
+
+/* ---------- chart 1: dumbbell marks ---------- */
+#viz-cli-mcp .fa-ring { fill: var(--surface); }
+#viz-cli-mcp .fa-row.is-hot .fa-ring { fill: var(--fa-hover); }
+#viz-cli-mcp .fa-dot-cli { fill: var(--fa-cli); }
+#viz-cli-mcp .fa-dot-mcp { fill: var(--surface); stroke: var(--fa-mcp); stroke-width: 2; }
+#viz-cli-mcp .fa-row.is-hot .fa-dot-mcp { fill: var(--fa-hover); }
+#viz-cli-mcp .fa-conn { stroke-width: 2; stroke-linecap: round; }
+#viz-cli-mcp .fa-conn--gain { stroke: color-mix(in srgb, var(--fa-cli) 42%, var(--surface)); }
+#viz-cli-mcp .fa-conn--loss { stroke: var(--fa-mcp); }
+
+/* ---------- chart 2: tool-call bars ---------- */
+#viz-toolcalls .fa-bar-mcp { fill: var(--fa-mcp); }
+#viz-toolcalls .fa-bar-cli { fill: var(--fa-cli); }
+#viz-toolcalls .fa-t-label { fill: var(--ink); font-size: 13px; font-weight: 600; }
+#viz-toolcalls .fa-t-detail { fill: var(--ink-3); font-family: var(--font-mono); font-size: 11.5px; }
+#viz-toolcalls .fa-t-tag { fill: var(--ink-3); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.02em; }
+#viz-toolcalls .fa-t-val { fill: var(--ink); font-size: 12px; font-weight: 500; }
+#viz-toolcalls .fa-t-note { fill: var(--ink-3); font-size: 12px; }
+#viz-toolcalls .fa-sep { stroke: var(--line-2); stroke-width: 1; shape-rendering: crispEdges; }
+
+/* ---------- table twins ----------
+   site.css styles every th like a column header (dark rule, bottom-aligned); the twins'
+   row headers (th[scope=row]) should read like body cells. Rows stay on one line and the
+   twin scrolls inside its own .table-scroll on narrow screens. */
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .viz-table .dtable :is(td, th) { padding: 7px 8px; white-space: nowrap; }
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .viz-table .dtable :is(td, th):first-child { padding-left: 0; }
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .viz-table .dtable :is(td, th):last-child { padding-right: 0; }
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .viz-table .dtable tbody th {
+  font-size: inherit; font-weight: 500; letter-spacing: 0; color: var(--ink);
+  border-bottom: 1px solid var(--line); vertical-align: top;
+}
+:is(#viz-cli-mcp, #viz-toolcalls, #viz-effort) .viz-table .dtable caption { white-space: normal; }
+#viz-toolcalls .viz-table .dtable tbody th { white-space: normal; min-width: 7.5em; }
+#viz-toolcalls .viz-table .dtable td:nth-child(2) {
+  white-space: normal; min-width: 10em; font-family: var(--font-mono); font-size: 12px; color: var(--ink-2);
+}
+#viz-toolcalls .viz-table .dtable tr.fa-total :is(th, td) { font-weight: 600; border-bottom: 0; }
+
+/* ---------- chart 3: reasoning-effort small multiples ---------- */
+#viz-effort .fa-ef-ylabel { margin: 0 0 6px; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+#viz-effort .fa-ef-grid {
+  display: grid; grid-template-columns: repeat(var(--fa-cols, 5), minmax(0, 1fr));
+  gap: 12px 10px;
+}
+#viz-effort .fa-ef-panel {
+  position: relative; display: flex; flex-direction: column; min-width: 0;
+  padding: 8px 0 2px; border-radius: 8px; cursor: default; -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.12s;
+}
+#viz-effort .fa-ef-panel:hover, #viz-effort .fa-ef-panel:focus-visible {
+  background: var(--fa-hover); --fa-ring-bg: var(--fa-hover);
+}
+#viz-effort .fa-ef-panel:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+#viz-effort .fa-ef-model {
+  padding: 0 4px 0 16px; font-size: 12.5px; font-weight: 600; line-height: 1.3; color: var(--ink);
+  overflow-wrap: break-word; text-wrap: balance;
+}
+#viz-effort .fa-ef-harness { padding: 1px 4px 0 16px; font-size: 11.5px; line-height: 1.3; color: var(--ink-3); }
+#viz-effort .fa-ef-svg { display: block; margin-top: auto; }
+#viz-effort .fa-ef-line { fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+#viz-effort .fa-ef-dot { fill: var(--c); }
+#viz-effort .fa-ring { fill: var(--fa-ring-bg, var(--surface)); }
+#viz-effort .fa-ef-val { fill: var(--ink); font-size: 11px; font-weight: 600; }
+#viz-effort .fa-ef-x { fill: var(--ink-3); font-size: 10.5px; }
+#viz-effort .fa-ef-tick { fill: var(--ink-3); font-size: 10.5px; }
+
+@media (prefers-reduced-motion: reduce) {
+  :is(#viz-cli-mcp, #viz-toolcalls) .fa-hit, #viz-effort .fa-ef-panel { transition: none; }
+}

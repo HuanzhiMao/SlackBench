@@ -1,0 +1,227 @@
+/* ==========================================================================
+   leaderboard.css — SlackBench leaderboard (#lb-root, class prefix "lb-")
+   Tokens and shared chart styles (.seg, .chip, .viz-*, .dtable, .sb-tip) are in site.css.
+   Geometry (--lb-cols, --lb-plot-w, --lb-track-x, …) is set by leaderboard.js on .lb.
+   ========================================================================== */
+
+#lb-root [hidden] { display: none !important; }
+
+#lb-root .lb {
+  --lb-row-h: 32px;
+  --lb-bar-h: 12px;
+  --lb-head-h: 40px;
+  --lb-hl-ext: 6px;          /* how far the human line reaches up into the head, to its label */
+  --lb-gap: 16px;
+  --lb-pad-x: 10px;
+  --lb-cols: 28px 180px 90px minmax(0, 1fr);
+  --lb-track-x: 340px;
+  --lb-plot-w: 400px;
+  --lb-hv: 84.5;
+  --lb-c: var(--c-overall);
+  --lb-surface: var(--bg);   /* what the chart sits on; value labels knock lines out with it */
+  --lb-dur: 350ms;
+  /* row separators are a translucent ink tint (≈ --line-2 on the surface) so they never cut the human line */
+  --lb-sep: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+#lb-root .lb[data-metric="AS"] { --lb-c: var(--c-as); }
+#lb-root .lb[data-metric="HA"] { --lb-c: var(--c-ha); }
+#lb-root .lb[data-metric="SU"] { --lb-c: var(--c-su); }
+#lb-root .lb[data-metric="CI"] { --lb-c: var(--c-ci); }
+#lb-root .lb:not([data-size="lg"]) { --lb-row-h: 38px; }
+
+/* ---------- controls ---------- */
+#lb-root .lb-controls { gap: 12px 28px; margin-bottom: 22px; }
+#lb-root .lb-ctl { display: flex; align-items: baseline; gap: 8px 12px; min-width: 0; max-width: 100%; }
+#lb-root .lb-ctl-label { flex: none; min-width: 54px; margin-right: 0; }
+/* labels move above the controls when a control row would not fit beside its label (set by JS) */
+#lb-root .lb[data-ctl="stacked"] .lb-ctl { flex-wrap: wrap; row-gap: 7px; }
+#lb-root .lb[data-ctl="stacked"] .lb-ctl-label { flex-basis: 100%; }
+#lb-root .lb[data-ctl="stacked"] .lb-controls { gap: 14px 24px; }
+#lb-root .lb-seg { flex-wrap: nowrap; }
+#lb-root .lb-seg .swatch { width: 8px; height: 8px; border-radius: 2px; }
+#lb-root .lb-short { display: none; }
+#lb-root .lb[data-seg="short"] .lb-full { display: none; }
+#lb-root .lb[data-seg="short"] .lb-short { display: inline; }
+#lb-root .lb-chips { flex: 1 1 auto; min-width: 0; }
+#lb-root .lb-chip { padding: 6px 10px; }
+#lb-root .lb-chip .count { font-size: 12px; }
+#lb-root .lb[data-size="xs"] .lb-seg button { padding: 6px 8px; gap: 5px; font-size: 13px; }
+#lb-root .lb[data-size="xs"] .lb-chip { padding: 5px 10px; font-size: 12.5px; }
+
+/* ---------- legend ---------- */
+#lb-root .lb-legend { align-items: center; gap: 6px 18px; margin: 0 0 6px; }
+#lb-root .lb-leg-item { display: inline-flex; align-items: center; gap: 7px; }
+#lb-root .lb-leg-human { width: 2px; height: 14px; border-radius: 1px; background: var(--c-human); flex: none; }
+#lb-root .lb-leg-muted { background: var(--lb-c); opacity: 0.32; }
+#lb-root .lb-leg-note { margin-left: auto; color: var(--ink-3); }
+#lb-root .lb:not([data-size="lg"]) .lb-leg-note { flex-basis: 100%; margin-left: 0; }
+
+/* ---------- chart frame ---------- */
+#lb-root .lb-chart { position: relative; }
+
+#lb-root .lb-head {
+  display: grid; grid-template-columns: var(--lb-cols); column-gap: var(--lb-gap); align-items: end;
+  height: var(--lb-head-h); padding: 0 var(--lb-pad-x) 9px;
+  font-size: 12px; line-height: 1; font-weight: 500; color: var(--ink-3);
+}
+#lb-root .lb-h { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#lb-root .lb-h-rank { text-align: right; font-family: var(--font-mono); font-weight: 400; }
+#lb-root .lb:not([data-size="lg"]) .lb-h-harness { display: none; }
+#lb-root .lb-scale { position: relative; align-self: stretch; }
+#lb-root .lb-tick {
+  position: absolute; bottom: 0; left: calc(var(--x) * var(--lb-plot-w) / 100);
+  transform: translateX(-50%); font-weight: 400; font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+#lb-root .lb-tick.is-hidden { visibility: hidden; }
+#lb-root .lb-hl-label {
+  position: absolute; bottom: 0; left: 0; display: inline-flex; align-items: baseline; gap: 5px;
+  white-space: nowrap; color: var(--ink-2); font-weight: 500;
+}
+/* two-tier head (narrow plots): human label on top, ticks below, the line hangs from the label */
+#lb-root .lb[data-head="two"] { --lb-head-h: 58px; --lb-hl-ext: 41px; }
+#lb-root .lb[data-head="two"] .lb-hl-label { top: 2px; bottom: auto; }
+#lb-root .lb-hl-v { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* gridlines + human reference, drawn behind the rows */
+#lb-root .lb-overlay {
+  position: absolute; top: var(--lb-head-h); bottom: 0; left: var(--lb-track-x); width: var(--lb-plot-w);
+  pointer-events: none; z-index: 0;
+}
+#lb-root .lb-gl { position: absolute; top: 0; bottom: 0; left: calc(var(--x) * 1%); width: 1px; background: var(--line-2); }
+#lb-root .lb-gl.is-base { background: var(--axis); }
+#lb-root .lb-hline {
+  position: absolute; top: calc(-1 * var(--lb-hl-ext)); bottom: 0; left: -1px; width: 2px; border-radius: 1px;
+  background: var(--c-human);
+  transform: translateX(calc(var(--lb-hv) * var(--lb-plot-w) / 100));
+}
+
+/* ---------- rows ---------- */
+#lb-root .lb-list {
+  list-style: none; margin: 0; padding: 0; position: relative; z-index: 1;
+  border-bottom: 1px solid var(--lb-sep);
+}
+#lb-root .lb-row {
+  --lb-row-bg: var(--lb-surface);
+  position: relative;
+  display: grid; grid-template-columns: var(--lb-cols); column-gap: var(--lb-gap); align-items: center;
+  min-height: var(--lb-row-h); padding: 2px var(--lb-pad-x);
+  border-top: 1px solid var(--lb-sep);
+  cursor: default;
+}
+#lb-root .lb-row:focus { outline: none; }
+#lb-root .lb-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* translucent fills so the gridlines and the human line stay visible underneath */
+#lb-root .lb-row.is-active {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+  --lb-row-bg: color-mix(in srgb, var(--ink) 5%, var(--lb-surface));
+}
+#lb-root .lb-row.is-sib {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  --lb-row-bg: color-mix(in srgb, var(--accent) 10%, var(--lb-surface));
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+#lb-root .lb-rank {
+  font-family: var(--font-mono); font-size: 12px; color: var(--ink-3);
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+#lb-root .lb-model { min-width: 0; font-size: 14px; font-weight: 500; line-height: 1.25; color: var(--ink); }
+#lb-root .lb-harness { min-width: 0; font-size: 13px; line-height: 1.25; color: var(--ink-3); }
+#lb-root .lb[data-size="lg"] .lb-name { display: contents; }
+#lb-root .lb:not([data-size="lg"]) .lb-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+#lb-root .lb:not([data-size="lg"]) .lb-harness { font-size: 11.5px; }
+#lb-root .lb[data-size="sm"] .lb-model { font-size: 13px; }
+#lb-root .lb[data-size="xs"] .lb-model { font-size: 12.5px; }
+#lb-root .lb[data-size="xs"] .lb-rank { font-size: 11px; }
+
+#lb-root .lb-track { position: relative; align-self: stretch; min-height: 26px; }
+#lb-root .lb-clip {
+  position: absolute; left: 0; top: 50%; width: var(--lb-plot-w); height: var(--lb-bar-h);
+  margin-top: calc(var(--lb-bar-h) / -2); overflow: hidden;
+}
+/* full-width bar slid left: transform-only length changes, square at the baseline, 4px data end */
+#lb-root .lb-bar {
+  position: absolute; inset: 0; border-radius: 0 4px 4px 0; background: var(--lb-c);
+  transform: translateX(calc((var(--v, 0) - 100) * 1%));
+}
+#lb-root .lb-val {
+  position: absolute; left: 0; top: 50%;
+  transform: translate(calc(var(--v, 0) * var(--lb-plot-w) / 100 + 2px), -50%);
+  padding: 1px 4px; border-radius: 4px; background: var(--lb-row-bg);
+  font-size: 12.5px; font-weight: 500; line-height: 1.2; color: var(--ink);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+#lb-root .lb[data-size="xs"] .lb-val { font-size: 12px; }
+
+/* harness emphasis: other harnesses recede, nothing is removed or repainted */
+#lb-root .lb-clip { transition: opacity 0.18s var(--ease); }
+#lb-root .lb-rank, #lb-root .lb-model, #lb-root .lb-harness, #lb-root .lb-val { transition: color 0.18s var(--ease); }
+#lb-root .lb-row.is-dim .lb-clip { opacity: 0.32; }
+#lb-root .lb-row.is-dim :is(.lb-rank, .lb-model, .lb-harness, .lb-val) { color: var(--ink-3); }
+#lb-root .lb-row.is-dim .lb-model { font-weight: 400; }
+#lb-root .lb-row.is-dim:is(.is-active, .is-sib, :focus-visible) .lb-clip { opacity: 1; }
+#lb-root .lb-row.is-dim:is(.is-active, .is-sib, :focus-visible) :is(.lb-model, .lb-val) { color: var(--ink); }
+
+/* metric switch: bars, labels and the human line glide (only while .is-anim is set) */
+#lb-root .lb.is-anim .lb-bar { transition: transform var(--lb-dur) var(--ease), background-color var(--lb-dur) var(--ease); }
+#lb-root .lb.is-anim .lb-val,
+#lb-root .lb.is-anim .lb-hline,
+#lb-root .lb.is-anim .lb-hl-label { transition: transform var(--lb-dur) var(--ease); }
+
+/* ---------- full results table ---------- */
+#lb-root .lb-table { margin-top: 26px; }
+#lb-root .lb-table > summary {
+  gap: 8px; padding: 8px 16px 8px 14px; border: 1px solid var(--line); border-radius: 999px;
+  font-size: 13.5px; font-weight: 500; color: var(--ink-2); background: var(--surface);
+  transition: color 0.15s, border-color 0.15s;
+}
+#lb-root .lb-table > summary:hover { color: var(--ink); border-color: var(--axis); }
+#lb-root .lb-table-note { margin: 14px 0 0; max-width: 820px; font-size: 13px; line-height: 1.5; color: var(--ink-3); }
+#lb-root .lb-table .table-scroll { margin-top: 10px; }
+#lb-root .lb-table-scroll:focus-visible { outline-offset: 2px; }
+#lb-root .lb-dtable { min-width: 760px; font-size: 13.5px; }
+#lb-root .lb-dtable th, #lb-root .lb-dtable td { padding: 8px 10px; }
+#lb-root .lb-dtable th:first-child, #lb-root .lb-dtable td:first-child { padding-left: 2px; }
+#lb-root .lb-dtable th:last-child, #lb-root .lb-dtable td:last-child { padding-right: 2px; }
+#lb-root .lb-dtable thead th { padding-top: 4px; padding-bottom: 6px; }
+#lb-root .lb-dtable tbody th {
+  font-size: inherit; font-weight: 500; letter-spacing: 0; color: var(--ink);
+  border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap;
+}
+#lb-root .lb-dtable td { white-space: nowrap; }
+#lb-root .lb-dtable .lb-td-rank { font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-3); }
+#lb-root .lb-dtable tr.is-ref > * { background: var(--bg-soft); color: var(--ink-2); }
+#lb-root .lb-dtable tr.is-ref > th { color: var(--ink); }
+#lb-root .lb-dtable tr.is-em > * { background: color-mix(in srgb, var(--accent) 8%, transparent); }
+/* the Model column stays put while the table scrolls sideways (opaque fills per row state) */
+#lb-root .lb-dtable thead th:nth-child(2),
+#lb-root .lb-dtable tbody th { position: sticky; left: 0; z-index: 1; background: var(--lb-surface); }
+#lb-root .lb-dtable tr.is-ref > th { background: var(--bg-soft); }
+#lb-root .lb-dtable tr.is-em > th { background: color-mix(in srgb, var(--accent) 8%, var(--lb-surface)); }
+#lb-root .lb-table-scroll.is-scrolled .lb-dtable thead th:nth-child(2),
+#lb-root .lb-table-scroll.is-scrolled .lb-dtable tbody th { box-shadow: inset -1px 0 0 var(--line); }
+
+#lb-root .lb-sort {
+  display: inline-flex; align-items: center; gap: 5px; margin: 0; padding: 2px 0; border: 0;
+  background: none; font: inherit; letter-spacing: inherit; color: inherit; cursor: pointer; white-space: nowrap;
+}
+#lb-root .lb-sort:hover, #lb-root th[aria-sort] .lb-sort { color: var(--ink); }
+#lb-root th.n .lb-sort { flex-direction: row-reverse; }
+#lb-root .lb-sort-i { position: relative; flex: none; width: 9px; height: 9px; opacity: 0; transition: opacity 0.15s; }
+#lb-root .lb-sort-i::before {
+  content: ""; position: absolute; left: 2px; top: 0; width: 5px; height: 5px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg);
+}
+#lb-root th[aria-sort="ascending"] .lb-sort-i::before { top: 3px; transform: rotate(-135deg); }
+#lb-root .lb-sort:hover .lb-sort-i { opacity: 0.45; }
+#lb-root th[aria-sort] .lb-sort-i { opacity: 1; }
+
+/* ---------- tooltip extras (the shared .sb-tip lives on <body>) ---------- */
+.sb-tip .lb-tip-rank { display: flex; align-items: baseline; gap: 4px; margin-top: 8px; font-size: 12px; color: var(--ink-3); }
+.sb-tip .lb-tip-rank-n { font-size: 15px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.sb-tip .tip-row.lb-tip-sel .l { color: var(--ink); font-weight: 600; }
+.sb-tip .lb-tip .tip-row:not(.lb-tip-sel) .v { font-weight: 500; color: var(--ink-2); }
+.sb-tip .lb-tip-sib { display: grid; gap: 3px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 12px; }
+.sb-tip .lb-tip-sib-k { color: var(--ink-3); }
+.sb-tip .lb-tip-sib-r { display: flex; justify-content: space-between; gap: 12px; color: var(--ink-2); }
+.sb-tip .lb-tip-sib-r b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
